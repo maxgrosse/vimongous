@@ -3,13 +3,14 @@ let s:pluginPath = expand("<sfile>:p:h")
 " searches the current buffer for a mongo DSN
 " line must be prefixed with //#dsn
 function! s:FindDsn()
+	set filetype=javascript
 	let s:dsnLine = search("//#dsn mongodb://.*")
 	if s:dsnLine > 0
 		let s:dsn = getline(s:dsnLine)
 		let s:dsn = matchstr(s:dsn, 'mongodb://.*')
 		return s:dsn
 	else
-		echo "Mongo DSN not found; please prefix a line with: //#dsn mongodb://{server}/{db}"
+		call append(0, '//#dsn mongodb://localhost/test')
 		return ""
 	endif
 endfunction
@@ -81,6 +82,9 @@ function! s:GetVisualSelection() range
 	let [lnum1, col1] = getpos("'<")[1:2]
 	let [lnum2, col2] = getpos("'>")[1:2]
 	let lines = getline(lnum1, lnum2)
+	if (len(lines)==0)
+		return ""
+	endif	
 	let lines[-1] = lines[-1][: col2 - 2]
 	let lines[0] = lines[0][col1 - 1:]
 	return join(lines, "\n")
